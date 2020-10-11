@@ -6,7 +6,7 @@ import java.io.*;
 
 public class Host {
 	
-	public static String fileP = "test.txt";
+	public static String fileP = "test.mp3";
 	
 	public static int port = 4999;
 	

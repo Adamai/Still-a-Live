@@ -8,11 +8,11 @@ public class Client {
 	public static int port = 4999;
 	public static String server = "127.0.0.1";
 	
-	public static String fileSave = "testDownloaded.txt";
+	public static String fileSave = "songDownloaded.mp3";
 	public static int fileSize = 888888;	//is this necessary?
 	
 	
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws Exception {
 		
 		FileOutputStream fos = null;
 		BufferedOutputStream bos = null;
@@ -50,7 +50,10 @@ public class Client {
 			
 			System.out.println("File downloaded: " + fileSave + " (" + currentBytes + " bytes received)");
 			
-		
+			MediaFX mfx = new MediaFX();
+			if(mfx.setMedia(fileSave))
+				mfx.play();
+			
 			
 			
 			PrintWriter pr = new PrintWriter(s.getOutputStream());
