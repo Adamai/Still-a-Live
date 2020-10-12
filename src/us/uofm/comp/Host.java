@@ -8,7 +8,7 @@ public class Host {
 	
 	public static String fileP = "test.mp3";
 	
-	public static int port = 4999;
+	public static int port = 3462;
 	
 	public static void main(String[] args) throws IOException {
 		

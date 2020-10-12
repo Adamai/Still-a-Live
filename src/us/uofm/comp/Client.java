@@ -1,18 +1,37 @@
 package us.uofm.comp;
 
 import java.net.*;
-import java.io.*;
 
-public class Client {
+import javafx.application.Application;
+
+import java.io.*;
+import java.io.File;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+public class Client extends Application {
 	
-	public static int port = 4999;
+	public static int port = 3462;
 	public static String server = "127.0.0.1";
 	
 	public static String fileSave = "songDownloaded.mp3";
-	public static int fileSize = 888888;	//is this necessary?
+	public static int fileSize = 9999999;	//is this necessary?
 	
+	MediaPlayer mp;
 	
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
+		launch(args);
+	}
+
+
+	@Override
+	public void start(Stage stage) throws Exception {
 		
 		FileOutputStream fos = null;
 		BufferedOutputStream bos = null;
@@ -23,10 +42,13 @@ public class Client {
 		
 		Socket s = null;
 		
-		try {
+		System.out.println("Looking for host...");
 		
+		Media musicFile;
+		
+		try {
+			
 			s = new Socket("localhost", port);
-			System.out.println("Looking for host...");
 			
 			byte byteArray[] = new byte[fileSize];
 			is = s.getInputStream();
@@ -36,6 +58,8 @@ public class Client {
 			
 			bytesRead = is.read(byteArray, 0, byteArray.length);
 			currentBytes = bytesRead;
+			
+			System.out.println();
 			
 			do {
 				bytesRead = is.read(byteArray, currentBytes, (byteArray.length - currentBytes));
@@ -50,9 +74,8 @@ public class Client {
 			
 			System.out.println("File downloaded: " + fileSave + " (" + currentBytes + " bytes received)");
 			
-			MediaFX mfx = new MediaFX();
-			if(mfx.setMedia(fileSave))
-				mfx.play();
+			File file = new File (fileSave);
+			musicFile = new Media(file.toURI().toURL().toString());
 			
 			
 			
@@ -72,6 +95,43 @@ public class Client {
 		    if (bos != null) bos.close();
 		}
 		
+		//-----------------------------
 		
+Button btn_play, btn_pause, btn_stop;
+		
+		btn_play = new Button("Play");
+		btn_pause = new Button("Pause");
+		btn_stop = new Button("Stop");
+		
+		btn_play.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				mp.play();
+			}
+		});
+		btn_pause.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				mp.pause();
+			}
+		});
+		btn_stop.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent arg0) {
+				mp.stop();
+			}
+		});
+		
+		mp = new MediaPlayer(musicFile);
+		//mp.setAutoPlay(true);
+		mp.setVolume(0.5);
+		
+		VBox root = new VBox();
+		root.getChildren().addAll(btn_play, btn_pause, btn_stop);
+		
+		Scene scene = new Scene(root, 500, 500);
+		stage.setScene(scene);
+		
+		stage.show();
 	}
 }
