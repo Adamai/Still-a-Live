@@ -6,7 +6,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.Queue;
 
 public class WorkerHost implements Runnable {
 
@@ -18,13 +21,14 @@ public class WorkerHost implements Runnable {
 	protected OutputStream outputS = null;
 	protected ObjectOutputStream oos = null;
 	protected Object lock = null;
-	protected DataOutputStream dOut = null;
+	protected ArrayList<String> sharedS = null;
 
-	public WorkerHost(Socket clientSocket, String clientName, String fileName, Object lock) {
+	public WorkerHost(Socket clientSocket, String clientName, String fileName, Object lock, ArrayList<String> sharedS) {
 		this.clientSocket = clientSocket;
 		this.clientName = clientName;
 		this.fileName = fileName;
 		this.lock = lock;
+		this.sharedS = sharedS;
 	}
 
 	public void run() {
@@ -33,6 +37,9 @@ public class WorkerHost implements Runnable {
 		File file = new File(fileName);
 		
 		FileContainer fc = new FileContainer();
+		System.out.println(fileName);
+		String[] pathSplit = fileName.split("\\\\");
+		fc.setFilename(pathSplit[pathSplit.length - 1]);
 		
 
 		byte[] bytearray = new byte[(int) file.length()];
@@ -42,7 +49,7 @@ public class WorkerHost implements Runnable {
 			bis.read(bytearray, 0, bytearray.length);
 			outputS = clientSocket.getOutputStream();
 			oos = new ObjectOutputStream(outputS);
-			fc.setFilename(fileName);
+			//fc.setFilename(fileName);
 			fc.setData(bytearray);
 			fc.setSize((int)file.length());
 
@@ -54,29 +61,39 @@ public class WorkerHost implements Runnable {
 			System.out.println("File sent. Now I'm going to wait until play is pressed");
 			// Wait for order from Host class to play
 			
-			synchronized (lock) {
-				lock.wait();
+			boolean quit = false;
+			PrintWriter pw = new PrintWriter(outputS, true);
+			
+			while(!quit) {
+				String inCommand = "";
+				synchronized (lock) {
+					lock.wait();
+				}
+				synchronized(sharedS) {
+					inCommand = sharedS.get(sharedS.size()-1);
+				}
+				System.out.println("Worker detected the command: " + inCommand);
+				
+				if(inCommand.equals("quit")) {
+					pw.println(inCommand);
+					quit = true;
+				} else{
+					pw.println(inCommand);
+				}
+				
+				
 			}
-			System.out.println("CORRE VADIA");
-			// CONTINUE HERE: SEND MESSAGE TO CLIENT PLAY MUSIC
-			dOut = new DataOutputStream(outputS);
-			dOut.writeUTF("play");
-			dOut.flush();
 			
 			
-
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			try {
 				if (bis != null)
 					bis.close();
-				//if (outputS != null)
-				//	outputS.close();
 				if (clientSocket != null)
 					clientSocket.close();
-				if(dOut != null)
-					dOut.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
