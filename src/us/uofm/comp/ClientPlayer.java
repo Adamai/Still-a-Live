@@ -1,5 +1,7 @@
 package us.uofm.comp;
 
+import org.apache.commons.net.ntp.TimeStamp;
+
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
 
@@ -17,6 +19,9 @@ public class ClientPlayer extends Thread {
 	}
 	
 	public void play() {
+		TimeStamp systemNtpTime = TimeStamp.getCurrentTime();
+		String sysTime = systemNtpTime.toDateString();
+		System.out.println("I'M PLAYING AT THIS TIME:\t" + sysTime);
 		mp.play();
 	}
 	

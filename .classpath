@@ -3,5 +3,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.USER_LIBRARY/JavaFX"/>
+	<classpathentry kind="lib" path="C:/Users/ropi2/Downloads/Gitprojects/Still-a-Live/commons-net-3.7.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
