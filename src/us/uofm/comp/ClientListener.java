@@ -63,7 +63,7 @@ public class ClientListener extends Thread/* implements Runnable */ {
 		cplayer.start();
 
 		newtClient = new NTPUDPClient();
-		newtClient.setDefaultTimeout(10_000);
+		newtClient.setDefaultTimeout(20_000);
 		try {
 			inetAddress = InetAddress.getByName("pool.ntp.org");
 		} catch (UnknownHostException e1) {
@@ -93,7 +93,7 @@ public class ClientListener extends Thread/* implements Runnable */ {
 				timestamp = timestamp.split(" ")[4];
 				System.out.println("Atomic time is: " + timestamp);
 				
-				double waitTime = Double.parseDouble(timestamp.split(":")[2]) % 2;
+				double waitTime = Double.parseDouble(timestamp.split(":")[2]) % 3;
 
 				if (incomingS.contains("play")) {
 					if (skip)
