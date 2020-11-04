@@ -76,19 +76,7 @@ public class ClientListener extends Thread/* implements Runnable */ {
 				incomingS = br.readLine();
 
 				String timestamp = getTime();
-				boolean skip = false;
-
-				// WORK ON CORRECTING THE DESYNCHRONIZATION WHEN FAILING TO GET TIME?
-
-				Timestamp currJavaTime = new Timestamp(new java.util.Date().getTime());
-				//while (timestamp == null) {
-					//waitSync(2);
-					//System.out.println("Time request failed. Trying again");
-					//timestamp = getTime();
-					//skip = true;
-				//}
-				Timestamp newJavaTime = new Timestamp(new java.util.Date().getTime());
-				double msToSkip = newJavaTime.getTime() - currJavaTime.getTime();
+				
 				//Mon, Nov 02 2020 15:43:51.135
 				timestamp = timestamp.split(" ")[4];
 				System.out.println("Atomic time is: " + timestamp);
@@ -96,12 +84,8 @@ public class ClientListener extends Thread/* implements Runnable */ {
 				double waitTime = Double.parseDouble(timestamp.split(":")[2]) % 3;
 
 				if (incomingS.contains("play")) {
-					if (skip)
-						cplayer.skipPlay(msToSkip);
-					else {
-						waitSync(waitTime);
-						cplayer.play();
-					}
+					waitSync(waitTime);
+					cplayer.play();
 				} else if (incomingS.contains("pause")) {
 					waitSync(waitTime);
 					cplayer.pause();
@@ -166,7 +150,8 @@ public class ClientListener extends Thread/* implements Runnable */ {
 			long currentTime = System.currentTimeMillis();
 			TimeStamp atomicNtpTime = TimeStamp.getNtpTime(currentTime + offset);
 			String atomicTime = atomicNtpTime.toDateString();
-			System.out.println("Atomic time:\t" + atomicTime);
+			//TEST IF GETTING THE DELAY HELPS
+			System.out.println("Atomic time:\t" + atomicTime + "Delay: " + timeInfo.getDelay());
 			
 			time = atomicTime;
 		} catch (Exception e) {
