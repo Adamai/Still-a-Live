@@ -5,10 +5,13 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -74,11 +77,11 @@ public class ClientListener extends Thread/* implements Runnable */ {
 				incomingS = br.readLine();
 
 				String timestamp = getTime();
-				
-				//Mon, Nov 02 2020 15:43:51.135
+
+				// Mon, Nov 02 2020 15:43:51.135
 				timestamp = timestamp.split(" ")[4];
 				System.out.println("Atomic time is: " + timestamp);
-				
+
 				double waitTime = Double.parseDouble(timestamp.split(":")[2]) % 3;
 
 				if (incomingS.contains("play")) {
@@ -120,16 +123,21 @@ public class ClientListener extends Thread/* implements Runnable */ {
 	private static void waitSync(double seconds) {
 		try {
 			int time = (int) (seconds * 1000);
-			sleep((long)time);
+			sleep((long) time);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
 
 	private String getTime() {
+		try {
+			getTime2();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 		String time = null;
 		try {
-			
+
 			TimeInfo timeInfo = newtClient.getTime(inetAddress);
 			timeInfo.computeDetails();
 			if (timeInfo.getOffset() != null) {
@@ -140,12 +148,57 @@ public class ClientListener extends Thread/* implements Runnable */ {
 			long currentTime = System.currentTimeMillis();
 			atomicNtpTime = TimeStamp.getNtpTime(currentTime + offset);
 			String atomicTime = atomicNtpTime.toDateString();
-			System.out.println("Atomic time: "+ atomicTime + " Offset: "+this.timeInfo.getOffset()+" Delay: "+this.timeInfo.getDelay() +" Return time: "+this.timeInfo.getReturnTime());
+			System.out.println("Atomic time: " + atomicTime + " Offset: " + this.timeInfo.getOffset() + " Delay: "
+					+ this.timeInfo.getDelay() + " Return time: " + this.timeInfo.getReturnTime());
 			time = atomicTime;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return time;
+	}
+
+	private String getTime2() throws IOException {
+		// Send request
+		DatagramSocket socket = new DatagramSocket();
+		InetAddress address = inetAddress;
+		byte[] buf = new NtpMessage().toByteArray();
+		DatagramPacket packet = new DatagramPacket(buf, buf.length, address, 123);
+
+		// Set the transmit timestamp *just* before sending the packet
+		// ToDo: Does this actually improve performance or not?
+		NtpMessage.encodeTimestamp(packet.getData(), 40, (System.currentTimeMillis() / 1000.0) + 2208988800.0);
+
+		socket.send(packet);
+
+		// Get response
+		System.out.println("NTP request sent, waiting for response...\n");
+		packet = new DatagramPacket(buf, buf.length);
+		socket.receive(packet);
+
+		// Immediately record the incoming timestamp
+		double destinationTimestamp = (System.currentTimeMillis() / 1000.0) + 2208988800.0;
+
+		// Process response
+		NtpMessage msg = new NtpMessage(packet.getData());
+
+		// Corrected, according to RFC2030 errata
+		double roundTripDelay = (destinationTimestamp - msg.originateTimestamp)
+				- (msg.transmitTimestamp - msg.receiveTimestamp);
+
+		double localClockOffset = ((msg.receiveTimestamp - msg.originateTimestamp)
+				+ (msg.transmitTimestamp - destinationTimestamp)) / 2;
+
+		// Display response
+		System.out.println(msg.toString());
+
+		System.out.println("Dest. timestamp:     " + NtpMessage.timestampToString(destinationTimestamp));
+
+		System.out.println("Round-trip delay: " + new DecimalFormat("0.00").format(roundTripDelay * 1000) + " ms");
+
+		System.out.println("Local clock offset: " + new DecimalFormat("0.00").format(localClockOffset * 1000) + " ms");
+
+		socket.close();
+		return msg.toString();
 	}
 
 }
