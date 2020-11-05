@@ -76,10 +76,16 @@ public class ClientListener extends Thread/* implements Runnable */ {
 			try {
 				incomingS = br.readLine();
 
-				String timestamp = getTime();
+				//String timestamp = getTime();
 
-				// Mon, Nov 02 2020 15:43:51.135
-				timestamp = timestamp.split(" ")[4];
+				//Mon, Nov 02 2020 15:43:51.135
+				//timestamp = timestamp.split(" ")[4];
+				
+				String timestamp = getTime();
+				//04-nov-2020 22:48:46,212000
+				timestamp = timestamp.replace(',', '.');
+				timestamp = timestamp.split(" ")[1];
+				
 				System.out.println("Atomic time is: " + timestamp);
 
 				double waitTime = Double.parseDouble(timestamp.split(":")[2]) % 3;
@@ -198,7 +204,7 @@ public class ClientListener extends Thread/* implements Runnable */ {
 		System.out.println("Local clock offset: " + new DecimalFormat("0.00").format(localClockOffset * 1000) + " ms");
 
 		socket.close();
-		return msg.toString();
+		return NtpMessage.timestampToString(destinationTimestamp);
 	}
 
 }
