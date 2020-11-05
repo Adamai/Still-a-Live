@@ -81,7 +81,7 @@ public class ClientListener extends Thread/* implements Runnable */ {
 				//Mon, Nov 02 2020 15:43:51.135
 				//timestamp = timestamp.split(" ")[4];
 				
-				String timestamp = getTime();
+				String timestamp = getTime2();
 				//04-nov-2020 22:48:46,212000
 				timestamp = timestamp.replace(',', '.');
 				timestamp = timestamp.split(" ")[1];
@@ -136,11 +136,7 @@ public class ClientListener extends Thread/* implements Runnable */ {
 	}
 
 	private String getTime() {
-		try {
-			getTime2();
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
+		
 		String time = null;
 		try {
 
