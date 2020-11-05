@@ -34,6 +34,7 @@ public class ClientListener extends Thread/* implements Runnable */ {
 	private InetAddress inetAddress;
 	private volatile TimeInfo timeInfo;
 	private volatile Long offset;
+	private TimeStamp atomicNtpTime;
 
 	private boolean quit = false;
 
@@ -137,9 +138,9 @@ public class ClientListener extends Thread/* implements Runnable */ {
 			}
 			// Calculating the remote server time. Atomic time
 			long currentTime = System.currentTimeMillis();
-			TimeStamp atomicNtpTime = TimeStamp.getNtpTime(currentTime + offset);
+			atomicNtpTime = TimeStamp.getNtpTime(currentTime + offset);
 			String atomicTime = atomicNtpTime.toDateString();
-			System.out.println("Atomic time: "+ atomicTime + " Offset: "+timeInfo.getOffset()+" Delay: "+timeInfo.getDelay());
+			System.out.println("Atomic time: "+ atomicTime + " Offset: "+this.timeInfo.getOffset()+" Delay: "+this.timeInfo.getDelay() +" Return time: "+this.timeInfo.getReturnTime());
 			time = atomicTime;
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -73,12 +73,9 @@ public class Client extends Application {
 						fos = new FileOutputStream(fileSave);
 						bos = new BufferedOutputStream(fos);
 
-						System.out.println("Finished getting file data. Writing it to a file");
 						// bos.write(byteArray, 0, currentBytes);
 						bos.write(fc.getData(), 0, fileSize);
 						bos.flush();
-
-						System.out.println("File downloaded: " + fileSave + " (" + fileSize + " bytes received). Now playing");
 
 						file = new File(fileSave);
 						musicFile = new Media(file.toURI().toURL().toString());
@@ -134,8 +131,5 @@ public class Client extends Application {
 
 	}
 
-	private void loadMusic() { // implement here the method to load another music file from host
-
-	}
 
 }
