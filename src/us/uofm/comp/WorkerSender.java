@@ -19,7 +19,6 @@ public class WorkerSender implements Runnable {
 			try {
 				oos.writeObject(fc);
 				oos.flush();
-				System.out.println("sender is done!");
 				//outputS.close();
 			} catch (IOException e) {
 				e.printStackTrace();

@@ -47,7 +47,6 @@ public class Client extends Application {
 
 	@Override
 	public void start(Stage stage) throws Exception {
-		System.out.println("Looking for host...");
 
 		try {
 			btn_connect = new Button("Connect");
@@ -90,7 +89,7 @@ public class Client extends Application {
 						// mp.setAutoPlay(true);
 						mp.setVolume(0.5);
 						
-						cl = new ClientListener(s, lbl_status, mp);
+						cl = new ClientListener(s, mp);
 						cl.start();						
 
 					} catch (Exception e) {
@@ -104,7 +103,7 @@ public class Client extends Application {
 			root.getChildren().addAll(lbl_status, txt_ip, btn_connect);
 
 			Scene scene = new Scene(root, 500, 500);
-			stage.setTitle("Cliente");
+			stage.setTitle("Client");
 			stage.setScene(scene);
 
 			stage.show();

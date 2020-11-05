@@ -2,8 +2,6 @@ package us.uofm.comp;
 
 import java.net.*;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -15,6 +13,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 
 import java.io.*;
 
@@ -33,6 +33,7 @@ public class Host extends Application {
 	private Label lbl;
 	private Label lblFile;
 	private Label lblClients;
+	
 
 	public static void main(String[] args) throws IOException {
 		launch(args);
@@ -94,7 +95,7 @@ public class Host extends Application {
 				Socket s;
 				try {
 					s = ss.accept();
-					new Thread(new WorkerHost(s, "Client " + clientCounter, fileP, lock, sharedS)).start();
+					new Thread(new WorkerHost(s, fileP, lock, sharedS)).start();
 					lblClients.setText(lblClients.getText() + "Client "+clientCounter + " File: " + fileP+"\n");
 					clientCounter++;
 				} catch (Exception e) {
@@ -115,9 +116,14 @@ public class Host extends Application {
 		});
 
 		lbl = new Label();
+		String ip = "";
+		try(final DatagramSocket socket = new DatagramSocket()){
+			  socket.connect(InetAddress.getByName("8.8.8.8"), 10002);
+			  ip = socket.getLocalAddress().getHostAddress();
+		}
 		lbl.setText("1. Select mp3 file to send and play."
-				+ "\n2. Add a client.\n"
-				+ "3. On the client: input the host IPv4 address and connect.\n"
+				+ "\n2. Select 'Add a client'.\n"
+				+ "3. On the client application: input this machine IPv4 address and select 'connect'. IPv4 address: "+ip+"\n"
 				+ "5. (Optional) Select another file and/or connect to more clients by repeating the previous steps.\n"
 				+ "6. Use the 'Play','Pause' and 'Stop' commands. Enjoy your synchronized player :)\n\n"
 				+ "Ps: To reset clients, please restart the program and reassign the clients/files.");
@@ -125,7 +131,7 @@ public class Host extends Application {
 		VBox root = new VBox();
 		root.getChildren().addAll(lblFile, btn_newFile, btn_addClient, btn_play, btn_pause, btn_stop, lbl, lblClients);
 
-		scene = new Scene(root, 700, 700);
+		scene = new Scene(root, 800, 700);
 		stage.setScene(scene);
 		stage.setTitle("Host");
 		stage.show();

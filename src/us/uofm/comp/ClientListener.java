@@ -21,7 +21,6 @@ import javafx.scene.media.MediaPlayer;
 
 public class ClientListener extends Thread/* implements Runnable */ {
 
-	private Label lbl_status = null;
 	private MediaPlayer mp = null;
 	private InputStream is = null;
 	private Socket s = null;
@@ -30,7 +29,6 @@ public class ClientListener extends Thread/* implements Runnable */ {
 	private Socket ntpSocket = null;
 	private String incomingS = null;
 	private BufferedReader br = null;
-	private BufferedReader br2 = null;
 
 	private NTPUDPClient newtClient;
 	private InetAddress inetAddress;
@@ -41,9 +39,8 @@ public class ClientListener extends Thread/* implements Runnable */ {
 
 	private ClientPlayer cplayer = null;
 
-	public ClientListener(Socket s, Label lbl_status, MediaPlayer mp) {
+	public ClientListener(Socket s, MediaPlayer mp) {
 		this.mp = mp;
-		this.lbl_status = lbl_status;
 		this.s = s;
 	}
 
@@ -63,16 +60,16 @@ public class ClientListener extends Thread/* implements Runnable */ {
 		cplayer.start();
 
 		newtClient = new NTPUDPClient();
-		newtClient.setDefaultTimeout(20_000);
+		newtClient.setDefaultTimeout(10_000);
 		try {
 			inetAddress = InetAddress.getByName("pool.ntp.org");
 		} catch (UnknownHostException e1) {
 			e1.printStackTrace();
+			quit = true;
 		}
 
 		while (!quit) {
 			try {
-				// use a switch?
 				incomingS = br.readLine();
 
 				String timestamp = getTime();
@@ -121,9 +118,6 @@ public class ClientListener extends Thread/* implements Runnable */ {
 
 	private static void waitSync(double seconds) {
 		try {
-			//if (seconds == 0) {
-			//	seconds++;
-			//}
 			int time = (int) (seconds * 1000);
 			sleep((long)time);
 		} catch (InterruptedException e) {
@@ -134,30 +128,22 @@ public class ClientListener extends Thread/* implements Runnable */ {
 	private String getTime() {
 		String time = null;
 		try {
+			
 			TimeInfo timeInfo = newtClient.getTime(inetAddress);
 			timeInfo.computeDetails();
 			if (timeInfo.getOffset() != null) {
 				this.timeInfo = timeInfo;
 				this.offset = timeInfo.getOffset();
 			}
-
-			// The current client system time. Should this be used?
-			TimeStamp systemNtpTime = TimeStamp.getCurrentTime();
-			String sysTime = systemNtpTime.toDateString();
-			System.out.println("System time:\t" + sysTime);
-
-			// Calculating the remote server NTP time. Atomic time
+			// Calculating the remote server time. Atomic time
 			long currentTime = System.currentTimeMillis();
 			TimeStamp atomicNtpTime = TimeStamp.getNtpTime(currentTime + offset);
 			String atomicTime = atomicNtpTime.toDateString();
-			//TEST IF GETTING THE DELAY HELPS
-			System.out.println("Atomic time:\t" + atomicTime + "Delay: " + timeInfo.getDelay());
-			
+			System.out.println("Atomic time: "+ atomicTime + " Offset: "+timeInfo.getOffset()+" Delay: "+timeInfo.getDelay());
 			time = atomicTime;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		return time;
 	}
 

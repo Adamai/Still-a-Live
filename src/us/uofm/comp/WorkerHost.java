@@ -23,9 +23,8 @@ public class WorkerHost implements Runnable {
 	protected Object lock = null;
 	protected ArrayList<String> sharedS = null;
 
-	public WorkerHost(Socket clientSocket, String clientName, String fileName, Object lock, ArrayList<String> sharedS) {
+	public WorkerHost(Socket clientSocket, String fileName, Object lock, ArrayList<String> sharedS) {
 		this.clientSocket = clientSocket;
-		this.clientName = clientName;
 		this.fileName = fileName;
 		this.lock = lock;
 		this.sharedS = sharedS;
