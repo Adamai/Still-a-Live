@@ -80,10 +80,6 @@ public class ClientListener extends Thread/* implements Runnable */ {
 
 				//Mon, Nov 02 2020 15:43:51.135
 				timestamp = timestamp.split(" ")[4];
-				
-				
-				
-				System.out.println("Atomic time is: " + timestamp);
 
 				double waitTime = Double.parseDouble(timestamp.split(":")[2]) % 3;
 
@@ -147,8 +143,8 @@ public class ClientListener extends Thread/* implements Runnable */ {
 			long currentTime = System.currentTimeMillis();
 			atomicNtpTime = TimeStamp.getNtpTime(currentTime + offset);
 			String atomicTime = atomicNtpTime.toDateString();
-			System.out.println("Atomic time: " + atomicTime + " Offset: " + this.timeInfo.getOffset() + " Delay: "
-					+ this.timeInfo.getDelay() + " Return time: " + this.timeInfo.getReturnTime());
+			//System.out.println("Atomic time: " + atomicTime + " Offset: " + this.timeInfo.getOffset() + " Delay: "
+			//		+ this.timeInfo.getDelay() + " Return time: " + this.timeInfo.getReturnTime());
 			time = atomicTime;
 		} catch (Exception e) {
 			e.printStackTrace();

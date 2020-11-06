@@ -15,13 +15,9 @@ public class ClientPlayer extends Thread {
 	
 	@Override
 	public void run() {
-		//mp.play();
 	}
 	
 	public void play() {
-		TimeStamp systemNtpTime = TimeStamp.getCurrentTime();
-		String sysTime = systemNtpTime.toDateString();
-		System.out.println("I'M PLAYING AT THIS TIME:\t" + sysTime);
 		mp.play();
 	}
 	

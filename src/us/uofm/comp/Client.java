@@ -21,10 +21,10 @@ import javafx.stage.WindowEvent;
 public class Client extends Application {
 
 	public static int port = 5999;
-	public static String server = "127.0.0.1"; // REMEMBER TO MODIFY HERE WHEN TESTING WITH ANOTHER MACHINE!
+	public static String server = "127.0.0.1";
 
 	public static String fileSave = "songDownloaded.mp3";
-	public static int fileSize = 20000000; // is this necessary?
+	public static int fileSize ; 
 
 	public static Label lbl_status = null;
 	public static MediaPlayer mp = null;

@@ -31,12 +31,10 @@ public class WorkerHost implements Runnable {
 	}
 
 	public void run() {
-		System.out.println("Client connected! Connected to: " + clientName);
 
 		File file = new File(fileName);
 		
 		FileContainer fc = new FileContainer();
-		System.out.println(fileName);
 		String[] pathSplit = fileName.split("\\\\");
 		fc.setFilename(pathSplit[pathSplit.length - 1]);
 		
@@ -48,17 +46,14 @@ public class WorkerHost implements Runnable {
 			bis.read(bytearray, 0, bytearray.length);
 			outputS = clientSocket.getOutputStream();
 			oos = new ObjectOutputStream(outputS);
-			//fc.setFilename(fileName);
 			fc.setData(bytearray);
 			fc.setSize((int)file.length());
 
-			System.out.println("Sending file: " + file + "(" + bytearray.length + "bytes)");
+			//System.out.println("Sending file: " + file + "(" + bytearray.length + "bytes)");
 			
-			//outputS.close();
 			new Thread(new WorkerSender(oos, fc)).run();
 
-			System.out.println("File sent. Now I'm going to wait until play is pressed");
-			// Wait for order from Host class to play
+			//System.out.println("File sent. Wait until play is pressed");
 			
 			boolean quit = false;
 			PrintWriter pw = new PrintWriter(outputS, true);
